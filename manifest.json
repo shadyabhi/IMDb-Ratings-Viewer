@@ -1,0 +1,13 @@
+{
+   "content_scripts": [ {
+      "js": [ "imdb.js" ],
+      "matches": [ "http://www.imdb.com/name/*" ]
+   } ],
+   "description": "Show ratings when you open actor's page.",
+   "icons": {
+      "128": "128.png"
+   },
+   "name": "IMDB Ratings Viewer",
+   "permissions": [ "http://www.imdb.com"],
+   "version": "1.1"
+}
