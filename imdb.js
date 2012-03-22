@@ -3,16 +3,23 @@ Author: shadyabhi (Abhijeet Rastogi)
 Email: abhijeet.1989@gmail.com
 */
 
-function addRating(url, element)
-{
-    var request = new XMLHttpRequest();
-    request.onreadystatechange = function(){
-        if ( request.readyState == 4 )  callback_addrating( request.responseText, element, request.status );
-    };
-    request.open( "GET", url, true );
-    request.send();
+/*MISC FUNCTIONS*/
+
+//Get rating value from localStorage
+function getRating_localStorage(element, typeOfElement){
+    var movie_link = getMovieLinkFromElement(element, typeOfElement);
+    var rating = localStorage.getItem(movie_link);
+    //If found, it's fine;else null is returned
+    return rating;
 }
 
+//Returns movie link from element object
+function getMovieLinkFromElement(element, typeOfElement){
+    if (typeOfElement == "normal") return element.childNodes[3].childNodes[1].href;
+    if (typeOfElement == "knownfor") return element.childNodes[5].href; 
+}
+
+//Returns a NodeList containing all Movie Elements
 function getMovieElements(){
     //All Movie elements are in 2 different classes (they do it for different color tones
     var ele_even = document.getElementsByClassName("filmo-row even");
@@ -30,13 +37,42 @@ function getMovieElements(){
     return all_elements;
 }
 
-function callback_addrating(serverResponse, element, status){
+/*END OF MISC FUNCTIONS*/
 
+
+//typeOfElement bcos we do a getMovieLinkFromElement() call
+function getRating_ajax(element, typeOfElement)
+{
+    var request = new XMLHttpRequest();
+    request.onreadystatechange = function(){
+        if ( request.readyState == 4 ){
+            callback_getAndsetRating_ajax(element, request, typeOfElement);
+        }
+    };
+    request.open( "GET", getMovieLinkFromElement(element, typeOfElement), true );
+    request.send();
+}
+
+
+
+function callback_getAndsetRating_ajax(element, request, typeOfElement){
+    var serverResponse = request.responseText;
     var pattern=/itemprop=\"ratingValue\"\>(.*?)\</;
-    var rating = null;
+    var rating = null; 
     var match_rating = serverResponse.match(pattern);
-    if (match_rating != null) rating = match_rating[1];
+    if (match_rating != null){
+        rating = match_rating[1];
+    }
+    if (rating != null){
+        localStorage.setItem(getMovieLinkFromElement(element, typeOfElement), rating);
+        if (typeOfElement == "normal") addRating_inpage(element.childNodes[3], rating);
+        if (typeOfElement == "knownfor") addRating_inpage(element.childNodes[5], rating);
+    }
+}
 
+//Adds rating only if rating is found else nothing is done
+function addRating_inpage(element, rating){
+    console.log(element); 
     if (rating != null){
         var container = document.createElement("span");
         var rating_container = document.createElement("span");  //Did this crap to make brackets black
@@ -49,21 +85,36 @@ function callback_addrating(serverResponse, element, status){
     }
 }
 
+//Wrapper to setRating for an element
+function setRating(element, typeOfElement){
+    var rating = null;
+        //First check in localStorage
+        rating = getRating_localStorage(element, typeOfElement);
+        if (rating == null){
+            //Not found in localStorage
+            rating = getRating_ajax(element, typeOfElement);
+        }
+        else{
+            if (typeOfElement == "normal") addRating_inpage(element.childNodes[3], rating);
+            if (typeOfElement == "knownfor") addRating_inpage(element.childNodes[5], rating);
+        }
+}    
+
 function main(){
+    //Ratings will be added in two phases. First the Knownfor part.
     try{
         //For suggestions
         var ele_knownfor = document.getElementById("knownfor");
         for (i=1; i<=7; i=i+2){ //Assumed number as 4
-            var ele_moviename = ele_knownfor.childNodes[i];
-            var movie_link = ele_moviename.childNodes[5].href;
-            addRating(movie_link, ele_moviename.childNodes[5]);
+            setRating(ele_knownfor.childNodes[i], "knownfor");
         }
     }
     catch (err) {}; //Catches Exception when KnownFor is not present for certains Actors.
+    
+    //Now comes the chance of the mainlist of movies.
     all_elements = getMovieElements();
     for (i=0; i<all_elements.length; i++){
-        var movie_link = all_elements[i].childNodes[3].childNodes[1].href;
-        addRating(movie_link, all_elements[i].childNodes[3]);
+        setRating(all_elements[i], "normal");
     }
 }
 
