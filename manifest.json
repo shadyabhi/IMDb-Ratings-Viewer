@@ -9,5 +9,5 @@
    },
    "name": "IMDB Ratings Viewer",
    "permissions": [ "http://www.imdb.com"],
-   "version": "1.1"
+   "version": "1.2"
 }
