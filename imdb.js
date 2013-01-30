@@ -16,7 +16,7 @@ function getRating_localStorage(element, typeOfElement){
 //Returns movie link from element object
 function getMovieLinkFromElement(element, typeOfElement){
     if (typeOfElement == "normal") return element.childNodes[3].childNodes[1].href;
-    if (typeOfElement == "knownfor") return element.childNodes[5].href; 
+    if (typeOfElement == "knownfor") return element.childNodes[5].href;
 }
 
 //Returns a NodeList containing all Movie Elements
@@ -57,8 +57,8 @@ function getRating_ajax(element, typeOfElement)
 
 function callback_getAndsetRating_ajax(element, request, typeOfElement){
     var serverResponse = request.responseText;
-    var pattern=/itemprop=\"ratingValue\"\>(.*?)\</;
-    var rating = null; 
+    var pattern=/titlePageSprite star-box-giga-star\"\>(.*?)\</;
+    var rating = null;
     var match_rating = serverResponse.match(pattern);
     if (match_rating != null){
         rating = match_rating[1];
@@ -72,7 +72,7 @@ function callback_getAndsetRating_ajax(element, request, typeOfElement){
 
 //Adds rating only if rating is found else nothing is done
 function addRating_inpage(element, rating){
-    console.log(element); 
+    console.log(element);
     if (rating != null){
         var container = document.createElement("span");
         var rating_container = document.createElement("span");  //Did this crap to make brackets black
@@ -98,7 +98,7 @@ function setRating(element, typeOfElement){
             if (typeOfElement == "normal") addRating_inpage(element.childNodes[3], rating);
             if (typeOfElement == "knownfor") addRating_inpage(element.childNodes[5], rating);
         }
-}    
+}
 
 function main(){
     //Ratings will be added in two phases. First the Knownfor part.
@@ -110,7 +110,7 @@ function main(){
         }
     }
     catch (err) {}; //Catches Exception when KnownFor is not present for certains Actors.
-    
+
     //Now comes the chance of the mainlist of movies.
     all_elements = getMovieElements();
     for (i=0; i<all_elements.length; i++){
