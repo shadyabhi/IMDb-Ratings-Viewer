@@ -1,6 +1,7 @@
 # About the script
 
 Show ratings when you open actor's page in IMDb
+Initially made for Chrome but it works on Firefox too as a greasemonkey script.
 
 # Motivation
 
