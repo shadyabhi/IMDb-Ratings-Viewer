@@ -9,6 +9,6 @@
       "128": "128.png"
    },
    "name": "IMDB Ratings Viewer",
-   "permissions": [ "http://www.imdb.com"],
+   "permissions": [ "http://www.imdb.com/"],
    "version": "1.3"
 }
