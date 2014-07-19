@@ -86,7 +86,12 @@ function addRating_inpage(element, rating){
 
 //Wrapper to setRating for an element
 function setRating(element, typeOfElement){
+    // typeOfElement can have two values
+    //      1. "knownfor"
+    //      2. "normal"
+
     var rating = null;
+
         //First check in localStorage
         rating = getRating_localStorage(element, typeOfElement);
         if (rating == null){
@@ -100,7 +105,12 @@ function setRating(element, typeOfElement){
 }
 
 function main(){
-    //Ratings will be added in two phases. First the Knownfor part.
+
+    //Ratings are to be presented in two places.
+    //  1. KnownFor div (group of 4 movies)
+    //  2. Actual movie list at the bottom
+
+    // Lets handle the KnownFor first
     try{
         //For suggestions
         var ele_knownfor = document.getElementById("knownfor");
@@ -110,7 +120,7 @@ function main(){
     }
     catch (err) {}; //Catches Exception when KnownFor is not present for certains Actors.
 
-    //Now comes the chance of the mainlist of movies.
+    // Lets handle the actual movie list now
     all_elements = getMovieElements();
     for (i=0; i<all_elements.length; i++){
         setRating(all_elements[i], "normal");
