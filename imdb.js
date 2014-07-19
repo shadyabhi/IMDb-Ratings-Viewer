@@ -15,8 +15,8 @@ function getRating_localStorage(element, typeOfElement){
 
 //Returns movie link from element object
 function getMovieLinkFromElement(element, typeOfElement){
-    if (typeOfElement == "normal") return element.childNodes[3].childNodes[1].href;
-    if (typeOfElement == "knownfor") return element.childNodes[5].href;
+    if (typeOfElement == "normal") return element.childNodes[3].childNodes[0].href;
+    if (typeOfElement == "knownfor") return element.childNodes[1].href;
 }
 
 //Returns a NodeList containing all Movie Elements
@@ -96,7 +96,7 @@ function setRating(element, typeOfElement){
         }
         else{
             if (typeOfElement == "normal") addRating_inpage(element.childNodes[3], rating);
-            if (typeOfElement == "knownfor") addRating_inpage(element.childNodes[5], rating);
+            if (typeOfElement == "knownfor") addRating_inpage(element.childNodes[3], rating);
         }
 }
 
