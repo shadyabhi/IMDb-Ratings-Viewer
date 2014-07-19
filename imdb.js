@@ -72,7 +72,6 @@ function callback_getAndsetRating_ajax(element, request, typeOfElement){
 
 //Adds rating only if rating is found else nothing is done
 function addRating_inpage(element, rating){
-    console.log(element);
     if (rating != null){
         var container = document.createElement("span");
         var rating_container = document.createElement("span");  //Did this crap to make brackets black
