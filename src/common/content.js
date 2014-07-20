@@ -1,3 +1,9 @@
+// ==UserScript==
+// @name IMDB Ratings Viewer
+// @include http://www.imdb.com/*
+// ==/UserScript==
+//
+
 /*
 Author: shadyabhi (Abhijeet Rastogi)
 Email: abhijeet.1989@gmail.com
@@ -65,8 +71,9 @@ function callback_getAndsetRating_ajax(element, request, typeOfElement){
     }
     if (rating != null){
         localStorage.setItem(getMovieLinkFromElement(element, typeOfElement), rating);
+        // Pass the #text node to addRating_inpage function
         if (typeOfElement == "normal") addRating_inpage(element.childNodes[3], rating);
-        if (typeOfElement == "knownfor") addRating_inpage(element.childNodes[5], rating);
+        if (typeOfElement == "knownfor") addRating_inpage(element.childNodes[4], rating);
     }
 }
 
@@ -113,9 +120,9 @@ function main(){
     // Lets handle the KnownFor first
     try{
         //For suggestions
-        var ele_knownfor = document.getElementById("knownfor");
+        var ele_knownfor = document.getElementById("knownfor").childNodes;
         for (i=1; i<=7; i=i+2){ //Assumed number as 4
-            setRating(ele_knownfor.childNodes[i], "knownfor");
+            setRating(ele_knownfor[i], "knownfor");
         }
     }
     catch (err) {}; //Catches Exception when KnownFor is not present for certains Actors.
