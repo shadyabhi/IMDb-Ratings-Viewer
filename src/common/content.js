@@ -63,7 +63,7 @@ function getRating_ajax(element, typeOfElement)
 
 function callback_getAndsetRating_ajax(element, request, typeOfElement){
     var serverResponse = request.responseText;
-    var pattern=/titlePageSprite star-box-giga-star\"\>(.*?)\</;
+    var pattern=/ratingValue\"\>(.*?)\</;
     var rating = null;
     var match_rating = serverResponse.match(pattern);
     if (match_rating != null){
