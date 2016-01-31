@@ -5,7 +5,13 @@
     "homepage_url": "https://github.com/shadyabhi/IMDb-Ratings-Viewer",
     "version": "2.0",
     "permissions": {
-        "content_scripts": ["http://www.imdb.com/*", "https://www.imdb.com/*"]
+        "content_scripts": ["http://www.imdb.com/*", "https://www.imdb.com/*"],
+        "xhr": ["http://www.imdb.com/*", "https://www.imdb.com/*"],
+        "tabs": false,
+        "context_menu": false,
+        "web_navigation": false,
+        "cookies": false,
+        "native_messaging": false
     },
     "name": "IMDB Ratings Viewer"
 }
