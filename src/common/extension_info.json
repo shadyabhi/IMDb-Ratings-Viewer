@@ -3,7 +3,7 @@
     "description": "Shows ratings beside Movie names on Actor pages",
     "creator": "shadyabhi",
     "homepage_url": "https://github.com/shadyabhi/IMDb-Ratings-Viewer",
-    "version": "2.0",
+    "version": "2.1",
     "permissions": {
         "content_scripts": ["http://www.imdb.com/*", "https://www.imdb.com/*"],
         "xhr": ["http://www.imdb.com/*", "https://www.imdb.com/*"],
