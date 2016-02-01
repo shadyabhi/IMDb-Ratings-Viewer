@@ -79,14 +79,19 @@ function callback_getAndsetRating_ajax(element, request, typeOfElement){
 
 //Adds rating only if rating is found else nothing is done
 function addRating_inpage(element, rating){
+    // Create class to style the rating value
+    var style = document.createElement('style');
+    style.type = 'text/css';
+    style.innerHTML = '.rating-value { color: black; background-color: #EFE3A4; display: inline; padding: .2em .6em .3em; font-size: 75%; font-weight: 700; line-height: 1; text-align: center; white-space: nowrap; vertical-align: baseline; border-radius: .25em; margin: 4px;}';
+
+    document.getElementsByTagName('head')[0].appendChild(style);
+
     if (rating != null){
         var container = document.createElement("span");
         var rating_container = document.createElement("span");  //Did this crap to make brackets black
         rating_container.appendChild(document.createTextNode(rating));
-        rating_container.className = "in_production";   //Give it a red color to mantain consistency
-        container.appendChild(document.createTextNode(" ("));
+        rating_container.className = "rating-value";
         container.appendChild(rating_container);
-        container.appendChild(document.createTextNode(")"));
         element.appendChild(container);
     }
 }
