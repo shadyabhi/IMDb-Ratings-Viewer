@@ -13,7 +13,7 @@ If you are a movie freak, a day won't pass when you won't open an actor's page a
 
 Screenshot:
 
-![IMDb Ratings Viewer](http://i.imgur.com/Lks0R.jpg)
+![IMDb Ratings Viewer](http://i.imgur.com/GCd9KiM.png)
 
 Youtube Video: http://www.youtube.com/watch?v=LUz4DJGULtk
 
