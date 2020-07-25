@@ -6,7 +6,7 @@
   "content_scripts": [
     {
       "run_at": "document_idle",
-      "matches": ["https://*.imdb.com/*"],
+      "matches": ["https://www.imdb.com/name/*"],
       "js": ["contentScript.js"]
     }
   ],
