@@ -16,8 +16,20 @@ class IMDBPage {
     // Create class to style the rating value
     var style = document.createElement("style");
     style.type = "text/css";
-    style.innerHTML =
-      ".rating-value { color: black; background-color: #EFE3A4; display: inline; padding: .2em .6em .3em; font-size: 75%; font-weight: 700; line-height: 1; text-align: center; white-space: nowrap; vertical-align: baseline; border-radius: .25em; margin: 4px;}";
+    style.innerHTML = `
+      .rating-value {
+        color: black;
+        background-color: #EFE3A4;
+        display: inline;
+        padding: .2em .6em .3em;
+        font-size: 100%;
+        font-weight: 700;
+        line-height: 1;
+        text-align: center;
+        white-space: nowrap;
+        vertical-align: baseline;
+        border-radius: .25em; margin: 4px;
+      }`;
 
     document.getElementsByTagName("head")[0].appendChild(style);
 
