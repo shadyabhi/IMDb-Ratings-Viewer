@@ -21,7 +21,7 @@ class IMDBPage {
         color: black;
         background-color: #EFE3A4;
         display: inline;
-        padding: .2em .6em .3em;
+        padding: .2em .2em .2em;
         font-size: 100%;
         font-weight: 700;
         line-height: 1;
