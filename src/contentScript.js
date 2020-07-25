@@ -70,11 +70,6 @@ class IMDBPage {
     }
   }
 
-  testing() {
-    var knownForElements = this.getKnownForElements();
-    this.setRating(knownForElements[0], "knownfor");
-  }
-
   /* Movie Element Getters */
   getKnownForElements() {
     var all = document.getElementById("knownfor").childNodes;
