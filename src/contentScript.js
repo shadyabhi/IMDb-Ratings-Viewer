@@ -38,6 +38,11 @@ class IMDBPage {
       var rating_container = document.createElement("span"); //Did this crap to make brackets black
       rating_container.appendChild(document.createTextNode(rating));
       rating_container.className = "rating-value";
+
+      // TODO: Make it configurable
+      if (rating < 6.5) {
+        rating_container.style.backgroundColor = "#fabdb4";
+      }
       container.appendChild(rating_container);
 
       element.childNodes[3].appendChild(container);
