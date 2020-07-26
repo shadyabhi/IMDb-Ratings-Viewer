@@ -2,7 +2,6 @@
   "name": "IMDB Ratings Viewer",
   "version": "2.3",
   "description": "Shows ratings beside Movie names on Actor pages",
-  "permissions": ["storage"],
   "content_scripts": [
     {
       "run_at": "document_idle",
