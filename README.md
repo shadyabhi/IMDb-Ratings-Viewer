@@ -1,6 +1,6 @@
 # About the Extension
 
-Show ratings when you open actor's page in IMDb. This extension uses Kango framework (http://kangoextensions.com/) to write cross-browser extension.
+Show ratings when you open actor's page in IMDb. 
 
 # Motivation
 
