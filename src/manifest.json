@@ -1,11 +1,14 @@
 {
   "name": "IMDB Ratings Viewer",
-  "version": "2.4",
+  "version": "2.5",
   "description": "Shows ratings beside Movie names on Actor pages",
   "content_scripts": [
     {
       "run_at": "document_idle",
-      "matches": ["https://www.imdb.com/name/*"],
+      "matches": [
+        "https://www.imdb.com/name/*",
+        "https://www.imdb.com/title/*"
+      ],
       "js": ["contentScript.js"]
     }
   ],

@@ -1,21 +1,26 @@
 class IMDBPage {
-  /* Add ratings to page */
-  addRatings() {
-    var knownForElements = this.getKnownForElements();
-    Array.from(knownForElements).forEach((ele) => {
-      this.setRating(ele);
-    });
+  constructor() {
+    this.addStyleSheet();
+  }
 
-    var regularMovieElements = this.getRegularMovieElements();
-    Array.from(regularMovieElements).forEach((ele) => {
+  addRatingsToPage() {
+    this.getKnownForElements()
+      .concat(this.getRegularMovieElements())
+
+      .forEach((ele) => {
+        this.setRating(ele);
+      });
+
+    this.getAllPosters().forEach((ele) => {
       this.setRating(ele);
     });
   }
 
-  addRatingOnMovieElement(element, rating) {
+  addStyleSheet() {
     // Create class to style the rating value
     var style = document.createElement("style");
     style.type = "text/css";
+    style.id = "irv-extension-style";
     style.innerHTML = `
       .rating-value {
         color: black;
@@ -29,38 +34,65 @@ class IMDBPage {
         white-space: nowrap;
         vertical-align: baseline;
         border-radius: .25em; margin: 4px;
-      }`;
+      }
+
+      .rating-value-poster {
+        position: absolute;
+        top: 0.4em;
+        right: 0em;
+      }
+      `;
 
     document.getElementsByTagName("head")[0].appendChild(style);
+  }
 
+  addRatingAsText(element, rating) {
     if (rating != null) {
-      var container = document.createElement("span");
-      var rating_container = document.createElement("span"); //Did this crap to make brackets black
-      rating_container.appendChild(document.createTextNode(rating));
-      rating_container.className = "rating-value";
-
-      // TODO: Make it configurable
-      if (rating < 6.5) {
-        rating_container.style.backgroundColor = "#fabdb4";
-      }
-      container.appendChild(rating_container);
-
-      element.childNodes[3].appendChild(container);
+      element.childNodes[3].appendChild(this.getRatingElement(rating));
     }
+  }
+
+  addRatingOnPoster(element, rating) {
+    if (rating != null) {
+      var container = this.getRatingElement(rating);
+      container.classList.add("rating-value-poster");
+
+      element.parentElement.style.position = "relative";
+      element.parentElement.prepend(container);
+    }
+  }
+
+  getRatingElement(rating) {
+    var container = document.createElement("span");
+    var rating_container = document.createElement("span"); //Did this crap to make brackets black
+    rating_container.appendChild(document.createTextNode(rating));
+    rating_container.className = "rating-value";
+
+    if (rating < 6.5) {
+      rating_container.style.backgroundColor = "#fabdb4";
+    }
+    container.appendChild(rating_container);
+    return container;
   }
 
   setRating(element) {
     // fast path
     var rating = this.getRatingFromCache(element);
     if (rating != null) {
-      return this.addRatingOnMovieElement(element, rating);
+      if (element.nodeName == "DIV") {
+        return this.addRatingAsText(element, rating);
+      }
+
+      if (element.nodeName == "IMG") {
+        return this.addRatingOnPoster(element, rating);
+      }
     }
 
     // ajax if not found in cache
     var request = new XMLHttpRequest();
     request.onreadystatechange = () => {
       if (request.readyState == 4) {
-        this.parseResponse(element, request);
+        this.processResp(element, request);
       }
     };
 
@@ -70,10 +102,17 @@ class IMDBPage {
 
   getMovieLinkFromElement(element) {
     // we strip query string since we don't need it
-    return element.getElementsByTagName("a")[0].href.split("?")[0];
+    // When adding as text
+    if (element.nodeName == "DIV") {
+      return element.getElementsByTagName("a")[0].href.split("?")[0];
+    }
+    // When adding on a poster
+    if (element.nodeName == "IMG") {
+      return element.parentElement.href.split("?")[0];
+    }
   }
 
-  parseResponse(element, request) {
+  processResp(element, request) {
     var serverResponse = request.responseText;
     var pattern = /ratingValue\"\>(.*?)\</;
     var rating = null;
@@ -83,22 +122,44 @@ class IMDBPage {
     }
     if (rating != null) {
       this.setRatingInCache(element, rating);
-      this.addRatingOnMovieElement(element, rating);
+      if (element.nodeName == "DIV") {
+        this.addRatingAsText(element, rating);
+      }
+      if (element.nodeName == "IMG") {
+        this.addRatingOnPoster(element, rating);
+      }
     }
   }
 
   /* Movie Element Getters */
   getKnownForElements() {
-    var all = document.getElementById("knownfor").childNodes;
-    let filtered = Array.from(all).filter(function (ele) {
+    var knownFor = document.getElementById("knownfor");
+    if (knownFor == null) {
+      return [];
+    }
+
+    let filtered = Array.from(knownFor.childNodes).filter(function (ele) {
       return ele.nodeName != "#text";
     });
     return filtered;
   }
 
   getRegularMovieElements() {
-    var all_elements = document.getElementsByClassName("filmo-row");
-    return all_elements;
+    return Array.from(document.getElementsByClassName("filmo-row"));
+  }
+
+  getAllPosters() {
+    var similarMovies = Array.from(
+      document.querySelectorAll('a > img[class="loadlate rec_poster_img"')
+    );
+
+    var trendingMovies = Array.from(
+      document.querySelectorAll('a > img[class="pri_image"')
+    ).filter(function (ele) {
+      return ele.parentElement.href.includes("/title");
+    });
+
+    return similarMovies.concat(trendingMovies);
   }
 
   /* Local Storage related methods */
@@ -112,4 +173,4 @@ class IMDBPage {
 }
 
 let page = new IMDBPage();
-page.addRatings();
+page.addRatingsToPage();
