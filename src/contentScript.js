@@ -1,19 +1,80 @@
-class IMDBPage {
+class IMDBRatings {
   constructor() {
-    this.addStyleSheet();
+    this.page = new IMDBPage();
   }
 
   addRatingsToPage() {
-    this.getKnownForElements()
-      .concat(this.getRegularMovieElements())
+    this.page
+      .getKnownForElements()
+      .concat(this.page.getRegularMovieElements())
 
       .forEach((ele) => {
         this.setRating(ele);
       });
 
-    this.getAllPosters().forEach((ele) => {
+    this.page.getAllPosters().forEach((ele) => {
       this.setRating(ele);
     });
+  }
+
+  setRating(element) {
+    // fast path
+    var rating = this.getRatingFromCache(element);
+    if (rating != null) {
+      if (element.nodeName == "DIV") {
+        return this.page.addRatingAsText(element, rating);
+      }
+
+      if (element.nodeName == "IMG") {
+        return this.page.addRatingOnPoster(element, rating);
+      }
+    }
+
+    // ajax if not found in cache
+    var request = new XMLHttpRequest();
+    request.onreadystatechange = () => {
+      if (request.readyState == 4) {
+        this.processRespAndSetRating(element, request);
+      }
+    };
+
+    request.open("GET", this.page.getMovieLinkFromElement(element), true);
+    request.send();
+  }
+
+  processRespAndSetRating(element, request) {
+    var serverResponse = request.responseText;
+    var pattern = /ratingValue\"\>(.*?)\</;
+    var rating = null;
+    var match_rating = serverResponse.match(pattern);
+    if (match_rating != null) {
+      rating = match_rating[1];
+    }
+    if (rating != null) {
+      this.setRatingInCache(element, rating);
+      if (element.nodeName == "DIV") {
+        this.page.addRatingAsText(element, rating);
+      }
+      if (element.nodeName == "IMG") {
+        this.page.addRatingOnPoster(element, rating);
+      }
+    }
+  }
+
+  /* Local Storage related methods */
+  getRatingFromCache(element) {
+    return localStorage.getItem(this.page.getMovieLinkFromElement(element));
+  }
+
+  setRatingInCache(element, rating) {
+    localStorage.setItem(this.page.getMovieLinkFromElement(element), rating);
+  }
+}
+
+// IMDBPage is used to interact with IMDB.com pages
+class IMDBPage {
+  constructor() {
+    this.addStyleSheet();
   }
 
   addStyleSheet() {
@@ -46,6 +107,49 @@ class IMDBPage {
     document.getElementsByTagName("head")[0].appendChild(style);
   }
 
+  /* Find elements where ratings need to be added */
+  getKnownForElements() {
+    var knownFor = document.getElementById("knownfor");
+    if (knownFor == null) {
+      return [];
+    }
+
+    let filtered = Array.from(knownFor.childNodes).filter(function (ele) {
+      return ele.nodeName != "#text";
+    });
+    return filtered;
+  }
+
+  getMovieLinkFromElement(element) {
+    // we strip query string since we don't need it
+    // When adding as text
+    if (element.nodeName == "DIV") {
+      return element.getElementsByTagName("a")[0].href.split("?")[0];
+    }
+    // When adding on a poster
+    if (element.nodeName == "IMG") {
+      return element.parentElement.href.split("?")[0];
+    }
+  }
+  getRegularMovieElements() {
+    return Array.from(document.getElementsByClassName("filmo-row"));
+  }
+
+  getAllPosters() {
+    var similarMovies = Array.from(
+      document.querySelectorAll('a > img[class="loadlate rec_poster_img"')
+    );
+
+    var trendingMovies = Array.from(
+      document.querySelectorAll('a > img[class="pri_image"')
+    ).filter(function (ele) {
+      return ele.parentElement.href.includes("/title");
+    });
+
+    return similarMovies.concat(trendingMovies);
+  }
+
+  /* Add ratings */
   addRatingAsText(element, rating) {
     if (rating != null) {
       element.childNodes[3].appendChild(this.getRatingElement(rating));
@@ -74,103 +178,11 @@ class IMDBPage {
     container.appendChild(rating_container);
     return container;
   }
-
-  setRating(element) {
-    // fast path
-    var rating = this.getRatingFromCache(element);
-    if (rating != null) {
-      if (element.nodeName == "DIV") {
-        return this.addRatingAsText(element, rating);
-      }
-
-      if (element.nodeName == "IMG") {
-        return this.addRatingOnPoster(element, rating);
-      }
-    }
-
-    // ajax if not found in cache
-    var request = new XMLHttpRequest();
-    request.onreadystatechange = () => {
-      if (request.readyState == 4) {
-        this.processResp(element, request);
-      }
-    };
-
-    request.open("GET", this.getMovieLinkFromElement(element), true);
-    request.send();
-  }
-
-  getMovieLinkFromElement(element) {
-    // we strip query string since we don't need it
-    // When adding as text
-    if (element.nodeName == "DIV") {
-      return element.getElementsByTagName("a")[0].href.split("?")[0];
-    }
-    // When adding on a poster
-    if (element.nodeName == "IMG") {
-      return element.parentElement.href.split("?")[0];
-    }
-  }
-
-  processResp(element, request) {
-    var serverResponse = request.responseText;
-    var pattern = /ratingValue\"\>(.*?)\</;
-    var rating = null;
-    var match_rating = serverResponse.match(pattern);
-    if (match_rating != null) {
-      rating = match_rating[1];
-    }
-    if (rating != null) {
-      this.setRatingInCache(element, rating);
-      if (element.nodeName == "DIV") {
-        this.addRatingAsText(element, rating);
-      }
-      if (element.nodeName == "IMG") {
-        this.addRatingOnPoster(element, rating);
-      }
-    }
-  }
-
-  /* Movie Element Getters */
-  getKnownForElements() {
-    var knownFor = document.getElementById("knownfor");
-    if (knownFor == null) {
-      return [];
-    }
-
-    let filtered = Array.from(knownFor.childNodes).filter(function (ele) {
-      return ele.nodeName != "#text";
-    });
-    return filtered;
-  }
-
-  getRegularMovieElements() {
-    return Array.from(document.getElementsByClassName("filmo-row"));
-  }
-
-  getAllPosters() {
-    var similarMovies = Array.from(
-      document.querySelectorAll('a > img[class="loadlate rec_poster_img"')
-    );
-
-    var trendingMovies = Array.from(
-      document.querySelectorAll('a > img[class="pri_image"')
-    ).filter(function (ele) {
-      return ele.parentElement.href.includes("/title");
-    });
-
-    return similarMovies.concat(trendingMovies);
-  }
-
-  /* Local Storage related methods */
-  getRatingFromCache(element) {
-    return localStorage.getItem(this.getMovieLinkFromElement(element));
-  }
-
-  setRatingInCache(element, rating) {
-    localStorage.setItem(this.getMovieLinkFromElement(element), rating);
-  }
 }
 
-let page = new IMDBPage();
-page.addRatingsToPage();
+function main() {
+  let imdb = new IMDBRatings();
+  imdb.addRatingsToPage();
+}
+
+main();
