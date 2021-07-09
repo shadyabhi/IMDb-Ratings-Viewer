@@ -63,11 +63,32 @@ class IMDBRatings {
 
   /* Local Storage related methods */
   getRatingFromCache(element) {
-    return localStorage.getItem(this.page.getMovieLinkFromElement(element));
+    var key = this.page.getMovieLinkFromElement(element);
+    var itemJsonStr = localStorage.getItem(key);
+
+    if (!itemJsonStr) {
+      return null;
+    }
+
+    var item = JSON.parse(itemJsonStr);
+    var now = new Date();
+    if (!item.expiry || now.getTime() > item.expiry) {
+      localStorage.removeItem(key);
+      return null;
+    }
+
+    return item.value;
   }
 
   setRatingInCache(element, rating) {
-    localStorage.setItem(this.page.getMovieLinkFromElement(element), rating);
+    var key = this.page.getMovieLinkFromElement(element);
+    var now = new Date();
+    var ttl = 604800000; // 1 week
+    var item = {
+      value: rating,
+      expiry: now.getTime() + ttl,
+    };
+    localStorage.setItem(key, JSON.stringify(item));
   }
 }
 
