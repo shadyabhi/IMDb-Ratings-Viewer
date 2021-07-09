@@ -44,7 +44,7 @@ class IMDBRatings {
 
   processRespAndSetRating(element, request) {
     var serverResponse = request.responseText;
-    var pattern = /ratingValue\"\>(.*?)\</;
+    var pattern = /"AggregateRatingButton__RatingScore.*?"\>(.*?)\</;
     var rating = null;
     var match_rating = serverResponse.match(pattern);
     if (match_rating != null) {
