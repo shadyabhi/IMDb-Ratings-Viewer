@@ -30,26 +30,38 @@ class IMDBRatings {
       }
     }
 
-    // ajax if not found in cache
-    var request = new XMLHttpRequest();
-    request.onreadystatechange = () => {
-      if (request.readyState == 4) {
-        this.processRespAndSetRating(element, request);
-      }
-    };
+    var url = this.page.getMovieLinkFromElement(element);
+    var titleId = url.replace(/.*\/(.*?)\//, "$1");
 
-    request.open("GET", this.page.getMovieLinkFromElement(element), true);
-    request.send();
+    fetch("https://api.graphql.imdb.com/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Origin": "https://www.imdb.com",
+      },
+      body: JSON.stringify({
+        query: `
+          query getRating($titleId: ID!) {
+            title(id: $titleId) {
+              ratingsSummary {
+                voteCount
+                aggregateRating
+              }
+            }
+          }
+        `,
+        operationName: "getRating",
+        variables: {
+          titleId: titleId,
+        },
+      }),
+    })
+    .then((res) => res.json())
+    .then((result) => this.processRespAndSetRating(element, result.data.title.ratingsSummary))
   }
 
-  processRespAndSetRating(element, request) {
-    var serverResponse = request.responseText;
-    var pattern = /"AggregateRatingButton__RatingScore.*?"\>(.*?)\</;
-    var rating = null;
-    var match_rating = serverResponse.match(pattern);
-    if (match_rating != null) {
-      rating = match_rating[1];
-    }
+  processRespAndSetRating(element, ratingsSummary) {
+    var rating = ratingsSummary.aggregateRating;
     if (rating != null) {
       this.setRatingInCache(element, rating);
       if (element.nodeName == "DIV") {
