@@ -54,7 +54,7 @@ class IMDBRatings {
     var rating = ratingsSummary.aggregateRating;
     if (rating != null) {
       this.setRatingInCache(element, rating);
-      if (element.nodeName == "DIV") {
+      if (element.nodeName == "LI") {
         this.page.addRatingAsText(element, rating);
       }
     }
@@ -103,26 +103,12 @@ class IMDBPage {
     style.type = "text/css";
     style.id = "irv-extension-style";
     style.innerHTML = `
-      .rating-value {
-        color: black;
-        background-color: #EFE3A4;
-        display: inline;
-        padding: .2em .2em .2em;
-        font-size: 100%;
-        font-weight: 700;
-        line-height: 1;
-        text-align: center;
-        white-space: nowrap;
-        vertical-align: baseline;
-        border-radius: .25em; margin: 4px;
+      .ipc-inline-list .ipc-rating-star {
+        margin-right: 9px !important;
+        position: relative;
+        top: 1px;
       }
-
-      .rating-value-poster {
-        position: absolute;
-        top: 0.4em;
-        right: 0em;
-      }
-      `;
+    `;
 
     document.getElementsByTagName("head")[0].appendChild(style);
   }
@@ -130,33 +116,35 @@ class IMDBPage {
   getMovieLinkFromElement(element) {
     // we strip query string since we don't need it
     // When adding as text
-    if (element.nodeName == "DIV") {
+    if (element.nodeName == "LI") {
       return element.getElementsByTagName("a")[0].href.split("?")[0];
     }
   }
   getRegularMovieElements() {
-    return Array.from(document.getElementsByClassName("filmo-row"));
+    return Array.from(document.querySelectorAll("ul.ipc-metadata-list:not(.date-unrel-credits-list) li.ipc-metadata-list-summary-item"));
   }
 
   /* Add ratings */
   addRatingAsText(element, rating) {
     if (rating != null) {
-      element.childNodes[3].appendChild(this.getRatingElement(rating));
+      var metaRows = element.querySelector("div.ipc-metadata-list-summary-item__tc");
+      var subtitleRows = metaRows.querySelectorAll("ul.ipc-metadata-list-summary-item__stl");
+      if (subtitleRows.length === 0) {
+        var ul = document.createElement("ul");
+        var li = document.createElement("li");
+        ul.appendChild(li);
+        var subtitleRowNew = metaRows.appendChild(ul);
+      }
+      var subtitleRow = subtitleRowNew || subtitleRows[0];
+      var ratingStar = document.querySelector(".ipc-rating-star-group").cloneNode(true);
+
+      if (rating > 6.5) {
+        ratingStar.childNodes[0].childNodes[0].setAttribute("fill", "red");
+      }
+
+      ratingStar.childNodes[0].childNodes[1].nodeValue = rating;
+      subtitleRow.childNodes[0].insertAdjacentHTML("beforeBegin", ratingStar.innerHTML);
     }
-  }
-
-
-  getRatingElement(rating) {
-    var container = document.createElement("span");
-    var rating_container = document.createElement("span"); //Did this crap to make brackets black
-    rating_container.appendChild(document.createTextNode(rating));
-    rating_container.className = "rating-value";
-
-    if (rating < 6.5) {
-      rating_container.style.backgroundColor = "#fabdb4";
-    }
-    container.appendChild(rating_container);
-    return container;
   }
 }
 
