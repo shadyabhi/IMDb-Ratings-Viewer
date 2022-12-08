@@ -5,9 +5,7 @@ class IMDBRatings {
 
   addRatingsToPage() {
     this.page
-      .getKnownForElements()
-      .concat(this.page.getRegularMovieElements())
-
+      .getRegularMovieElements()
       .forEach((ele) => {
         this.setRating(ele);
       });
@@ -138,19 +136,6 @@ class IMDBPage {
       `;
 
     document.getElementsByTagName("head")[0].appendChild(style);
-  }
-
-  /* Find elements where ratings need to be added */
-  getKnownForElements() {
-    var knownFor = document.getElementById("knownfor");
-    if (knownFor == null) {
-      return [];
-    }
-
-    let filtered = Array.from(knownFor.childNodes).filter(function (ele) {
-      return ele.nodeName != "#text";
-    });
-    return filtered;
   }
 
   getMovieLinkFromElement(element) {
