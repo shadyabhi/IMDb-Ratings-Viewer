@@ -9,10 +9,6 @@ class IMDBRatings {
       .forEach((ele) => {
         this.setRating(ele);
       });
-
-    this.page.getAllPosters().forEach((ele) => {
-      this.setRating(ele);
-    });
   }
 
   setRating(element) {
@@ -21,10 +17,6 @@ class IMDBRatings {
     if (rating != null) {
       if (element.nodeName == "DIV") {
         return this.page.addRatingAsText(element, rating);
-      }
-
-      if (element.nodeName == "IMG") {
-        return this.page.addRatingOnPoster(element, rating);
       }
     }
 
@@ -64,9 +56,6 @@ class IMDBRatings {
       this.setRatingInCache(element, rating);
       if (element.nodeName == "DIV") {
         this.page.addRatingAsText(element, rating);
-      }
-      if (element.nodeName == "IMG") {
-        this.page.addRatingOnPoster(element, rating);
       }
     }
   }
@@ -144,27 +133,9 @@ class IMDBPage {
     if (element.nodeName == "DIV") {
       return element.getElementsByTagName("a")[0].href.split("?")[0];
     }
-    // When adding on a poster
-    if (element.nodeName == "IMG") {
-      return element.parentElement.href.split("?")[0];
-    }
   }
   getRegularMovieElements() {
     return Array.from(document.getElementsByClassName("filmo-row"));
-  }
-
-  getAllPosters() {
-    var similarMovies = Array.from(
-      document.querySelectorAll('a > img[class="loadlate rec_poster_img"')
-    );
-
-    var trendingMovies = Array.from(
-      document.querySelectorAll('a > img[class="pri_image"')
-    ).filter(function (ele) {
-      return ele.parentElement.href.includes("/title");
-    });
-
-    return similarMovies.concat(trendingMovies);
   }
 
   /* Add ratings */
@@ -174,15 +145,6 @@ class IMDBPage {
     }
   }
 
-  addRatingOnPoster(element, rating) {
-    if (rating != null) {
-      var container = this.getRatingElement(rating);
-      container.classList.add("rating-value-poster");
-
-      element.parentElement.style.position = "relative";
-      element.parentElement.prepend(container);
-    }
-  }
 
   getRatingElement(rating) {
     var container = document.createElement("span");
