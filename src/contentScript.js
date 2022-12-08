@@ -11,6 +11,22 @@ class IMDBRatings {
       });
   }
 
+  addRatingsListener() {
+    document.querySelectorAll(".ipc-accordion__item__content").forEach(accordion => {
+      var observer = new MutationObserver(mutationRecords => {
+        mutationRecords.forEach(mutation => {
+          if (mutation.type === "attributes" && mutation.target.className === "ipc-image") {
+            this.setRating(mutation.target.closest("li"));
+          }
+        });
+      });
+      observer.observe(accordion, {
+        subtree: true,
+        attributeOldValue: true
+      });
+    });
+  }
+
   setRating(element) {
     // fast path
     var rating = this.getRatingFromCache(element);
@@ -151,6 +167,7 @@ class IMDBPage {
 function main() {
   let imdb = new IMDBRatings();
   imdb.addRatingsToPage();
+  imdb.addRatingsListener();
 }
 
 main();
