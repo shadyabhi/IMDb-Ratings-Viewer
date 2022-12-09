@@ -98,7 +98,7 @@ class IMDBRatings {
   setRatingInCache(element, rating) {
     var key = this.page.getMovieLinkFromElement(element);
     var now = new Date();
-    var ttl = 604800000; // 1 week
+    var ttl = 3600*24*7;
     var item = {
       value: rating,
       expiry: now.getTime() + ttl,
