@@ -27,6 +27,29 @@ class IMDBRatings {
     });
   }
 
+  addListListener() {
+    var lastMutation;
+    var filmography = document.querySelector('div[data-testid="Filmography"]');
+    var observer = new MutationObserver(mutationRecords => {
+      mutationRecords.forEach(mutation => {
+        if (mutation.target.className === 'ipc-accordion__item__content') {
+          if (lastMutation !== mutation.target) {
+            mutation.target.querySelectorAll('.ipc-metadata-list-summary-item').forEach(list => {
+              if (!list.querySelector('.ipc-rating-star')) {
+                this.setRating(list);
+              };
+            });
+            lastMutation = mutation.target;
+          };
+        };
+      });
+    });
+    observer.observe(filmography, {
+      subtree: true,
+      attributeOldValue: true,
+    });
+  }
+
   setRating(element) {
     // fast path
     var rating = this.getRatingFromCache(element);
@@ -168,6 +191,7 @@ function main() {
   let imdb = new IMDBRatings();
   imdb.addRatingsToPage();
   imdb.addRatingsListener();
+  imdb.addListListener();
 }
 
 main();
