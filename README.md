@@ -19,3 +19,17 @@ Youtube Video: http://www.youtube.com/watch?v=LUz4DJGULtk
 # Installing Extension
 
 Chrome Users: https://chrome.google.com/webstore/detail/daaoegihbflfijkdhalidlmochdbobgb
+
+# Push to Chrome webstore
+
+- [ ] Increment the version in `src/manifest.json`
+
+- [ ] Create a zip
+
+```
+make webstore-zip
+```
+
+- [ ] Visit `Developer Dashboard` on Chrome Webstore and open `Package` tab, click `Upload new package` on top.
+
+- [ ] Hit `Submit for Review`
