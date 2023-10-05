@@ -1,3 +1,7 @@
+# NOTICE
+
+This feature is now natively available on imdb.com, so after 10+ yrs of service, it is time to archive this repository.
+
 # About the Extension
 
 Show ratings when you open actor's page in IMDb. 
